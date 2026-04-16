@@ -37,16 +37,25 @@ jobs:
               "TAGGED=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           }
 
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          install: true
+          driver: docker-container
+
       # Always push to latest, but only put VERSION if TAGGED is true
       - name: Build and push with cache
         uses: docker/build-push-action@v7
         with:
           context: .
           push: true
-          tags: |
-            - ghcr.io/${{ github.repository_owner }}/jupyter-to-pdf:latest
-            - ${{ steps.vars.outputs.TAGGED == 'true'
-                  && format('ghcr.io/{0}/jupyter-to-pdf:{1}',
-                            github.repository_owner,
-                            steps.vars.outputs.VERSION)
-                  || null }}
+          tags: ${{
+            join(format('ghcr.io/{0}/{1}:latest',
+              github.repository_owner,
+              github.event.repository.name),
+            steps.vars.outputs.TAGGED == 'true' && format('ghcr.io/{0}/{1}:{2}',
+              github.repository_owner,
+              github.event.repository.name,
+              steps.vars.outputs.VERSION) || null) }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/jupyter-to-pdf:cache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/jupyter-to-pdf:cache,mode=max
