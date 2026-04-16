@@ -36,6 +36,9 @@ All inputs are strings and are optional.
 ```yaml
 name: Convert notebook to PDF
 
+permissions:
+  contents: write
+
 on:
   push:
     branches: [main]
@@ -60,16 +63,18 @@ jobs:
           dry_run: ${{ env.DRY_RUN }}
           input_dirs: "scripts"
           output_dir: "."
-          packages: "polars altair"
+          execute: "true"
+          requirements: "requirements.txt"
 
       - name: Commit PDF back to repo
         if: ${{ env.DRY_RUN == 'false' }}
         run: |
           git config user.name "Peter Parker"
           git config user.email "spiderman@parkerpictures.web"
-          git add **/*.pdf
+          echo "Searching for PDFs recursively..."
+          find "$GITHUB_WORKSPACE" -type f -name "*.pdf" -print0 |
+            xargs -0 git add
           git commit -m "Update analysis notebook PDF" ||
             echo "No changes to commit"
           git push
-
 ```

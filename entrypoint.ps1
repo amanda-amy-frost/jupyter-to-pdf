@@ -1,16 +1,17 @@
-Write-Host "=== Jupyter PDF Conversion Action ===" -ForegroundColor Blue
+# GitHub appends INPUT_ to the environment variables before setting them
+Write-Host "=== Jupyter PDF Conversion Action ==="
 Write-Host "Input directories: $env:INPUT_INPUT_DIRS"
 Write-Host "Output directory: $env:INPUT_OUTPUT_DIR"
 Write-Host "Dry run: $env:INPUT_DRY_RUN"
 Write-Host "Execute notebooks: $env:INPUT_EXECUTE"
-Write-Host "Packages: $env:INPUT_PACKAGES"
-Write-Host "=====================================" -ForegroundColor Blue
+Write-Host "Requirements path: $env:INPUT_REQUIREMENTS"
+Write-Host "====================================="
 
 $DryRun = $env:INPUT_DRY_RUN.ToLower() -eq "true"
 $ExecBook = $env:INPUT_EXECUTE.ToLower() -eq "true"
-$Packages = $env:INPUT_PACKAGES -split '\s+'
-$InputDirs = $env:INPUT_INPUT_DIRS
+$Requirements = $env:INPUT_REQUIREMENTS
 
+$InputDirs = $env:INPUT_INPUT_DIRS
 # Default output directory
 if (-not $env:INPUT_OUTPUT_DIR) {
     $OutputDir = "pdf"
@@ -18,12 +19,10 @@ if (-not $env:INPUT_OUTPUT_DIR) {
     $OutputDir = $env:INPUT_OUTPUT_DIR
 }
 
-
-if ($Packages) {
-    Write-Host "Installing Python packages: $Packages" -ForegroundColor Green
-    pip install $Packages
+if ($Requirements -and (Test-Path $Requirements)) {
+    Write-Host "Installing Python dependencies from $Requirements"
+    pip install -r $Requirements
 }
-
 
 # Determine notebook list
 $Notebooks = @()
@@ -52,18 +51,17 @@ if ($Notebooks.Count -eq 0) {
     exit 0
 }
 
-Write-Host "Found $($Notebooks.Count) notebook(s):" -ForegroundColor Green
+Write-Host "Found $($Notebooks.Count) notebook(s):"
 $Notebooks | ForEach-Object { Write-Host "- $_" }
 
 if ($DryRun) {
-    "Dry run enabled — no execution or conversion will be performed." |
-        Write-Host -ForegroundColor Blue
+    Write-Host "Dry run enabled — no execution or conversion will be performed."
     exit 0
 }
 
 # Ensure output directory exists
 if (-not (Test-Path $OutputDir)) {
-    Write-Host "Creating output directory: $OutputDir" -ForegroundColor Green
+    Write-Host "Creating output directory: $OutputDir"
     New-Item -ItemType Directory -Path $OutputDir | Out-Null
 }
 
@@ -84,10 +82,10 @@ foreach ($Book in $Notebooks) {
             $Book `
             --output-dir $OutputDir
 
-        Write-Host "Successfully converted: $Book" -ForegroundColor Green
+        Write-Host "Successfully converted: $Book"
     } catch {
         Write-Error "Failed to convert ${Book}: $_"
     }
 }
 
-Write-Host "=== Conversion complete ===" -ForegroundColor Blue
+Write-Host "=== Conversion complete ==="
