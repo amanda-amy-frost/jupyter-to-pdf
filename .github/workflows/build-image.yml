@@ -37,6 +37,12 @@ jobs:
               "TAGGED=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           }
 
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          install: true
+          driver: docker-container
+
       # Always push to latest, but only put VERSION if TAGGED is true
       - name: Build and push with cache
         uses: docker/build-push-action@v7
