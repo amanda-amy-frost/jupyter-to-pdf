@@ -2,7 +2,8 @@ name: CI
 
 on:
   push:
-  pull_request:
+    paths-ignore:
+      - ".github/workflows/build-image.yml"
 
 jobs:
   test-converter-action:
