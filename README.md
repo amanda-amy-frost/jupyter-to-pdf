@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Convert notebooks
-        uses: amanda-amy-frost/jupyter-to-pdf@v1
+        uses: amanda-amy-frost/jupyter-to-pdf-action@v1
         with:
           input_dirs: "scripts"
           output_dir: "."
