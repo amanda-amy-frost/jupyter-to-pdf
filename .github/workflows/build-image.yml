@@ -44,11 +44,12 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/jupyter-to-pdf:latest
-            ${{ steps.vars.outputs.TAGGED == 'true'
-              && format('ghcr.io/{0}/jupyter-to-pdf:{1}',
-                github.repository_owner,
-                steps.vars.outputs.VERSION)
-              || '' }}
+            - ghcr.io/${{ github.repository_owner }}/jupyter-to-pdf:latest
+            - ${{ steps.vars.outputs.TAGGED == 'true'
+                  && format('ghcr.io/{0}/jupyter-to-pdf:{1}',
+                            github.repository_owner,
+                            steps.vars.outputs.VERSION)
+                  || '' }}
+
           cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/jupyter-to-pdf:cache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/jupyter-to-pdf:cache,mode=max
