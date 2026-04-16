@@ -2,9 +2,10 @@ name: CI
 
 on:
   push:
-    paths-ignore:
-      - "README.md"
-      - ".github/workflows/build-image.yml"
+    paths:
+      - "action.yml"
+      - "Dockerfile"
+      - "entrypoint.ps1"
 
 jobs:
   test-converter-action:
