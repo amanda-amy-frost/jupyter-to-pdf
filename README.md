@@ -27,6 +27,9 @@ All inputs are strings and are optional.
 - `execute`:
   - If true, run the notebooks before converting them.
   - Default: `"true"`
+-  requirements:
+  - Path to requirements.txt file for pip to install before running notebooks.
+  - Default: `""`
 
 ### Example workflow
 
@@ -38,11 +41,15 @@ on:
     branches: [main]
     paths:
       - "scripts/*.ipynb"
+      - ".github/workflows/convert-notebook.yml"
   workflow_dispatch:
 
 jobs:
   convert-and-commit:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
+    env:
+        DRY_RUN: "false"
 
     steps:
       - uses: actions/checkout@v6
@@ -52,13 +59,16 @@ jobs:
         with:
           input_dirs: "scripts"
           output_dir: "."
+          dry_run: ${{ env.DRY_RUN }}
 
-      - name: Commit PDFs back to repo
+      - name: Commit PDF back to repo
+        if: ${{ env.DRY_RUN == 'false' }}
         run: |
-          git config user.name "Peter parker"
-          git config user.email "spiderman@parkerphotography.com"
-          git add *.pdf
-          git commit -m "Update generated Jupyter notebook PDFs" ||
+          git config user.name "Peter Parker"
+          git config user.email "spiderman@parkerpictures.web"
+          git add **/*.pdf
+          git commit -m "Update analysis notebook PDF" ||
             echo "No changes to commit"
           git push
+
 ```

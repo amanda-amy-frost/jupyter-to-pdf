@@ -3,6 +3,7 @@ Write-Host "Input directories: $env:INPUT_INPUT_DIRS"
 Write-Host "Output directory: $env:INPUT_OUTPUT_DIR"
 Write-Host "Dry run: $env:INPUT_DRY_RUN"
 Write-Host "Execute notebooks: $env:INPUT_EXECUTE"
+Write-Host "Input requirements path: $env:INPUT_REQUIREMENTS"
 Write-Host "=====================================" -ForegroundColor Blue
 
 # Normalize booleans
@@ -15,6 +16,11 @@ if (-not $env:INPUT_OUTPUT_DIR) {
     $OutputDir = "pdf"
 } else {
     $OutputDir = $env:INPUT_OUTPUT_DIR
+}
+
+if ($env:INPUT_REQUIREMENTS -and (Test-Path $env:INPUT_REQUIREMENTS)) {
+    Write-Host "Installing Python dependencies from $env:INPUT_REQUIREMENTS"
+    pip install -r $env:INPUT_REQUIREMENTS
 }
 
 # Determine notebook list

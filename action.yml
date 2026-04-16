@@ -18,6 +18,11 @@ inputs:
     description: "If true, run the notebooks before converting them."
     required: false
     default: "true"
+  requirements:
+    description: "Path to requirements.txt file for pip to install before running notebooks."
+    required: false
+    default: ""
+
 
 runs:
   using: "docker"
